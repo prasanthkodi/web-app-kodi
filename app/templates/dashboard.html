@@ -4,13 +4,6 @@
 <div class="container">
     <h1 class="text-center my-4">Dashboard</h1>
 
-    <!-- Chart Section -->
-    <div class="row mb-4">
-        <div class="col-md-8 offset-md-2">
-            <canvas id="myChart" width="400" height="200"></canvas>
-        </div>
-    </div>
-
     <!-- Data Table Section -->
     <div class="row">
         <div class="col">
@@ -22,6 +15,14 @@
                             <th>Passenger ID</th>
                             <th>Name</th>
                             <th>Age</th>
+                            <th>Class</th>
+                            <th>Sex</th>
+                            <th>Siblings/Spouses</th>
+                            <th>Parents/Children</th>
+                            <th>Ticket</th>
+                            <th>Fare</th>
+                            <th>Cabin</th>
+                            <th>Embarked</th>
                             <th>Survived</th>
                         </tr>
                     </thead>
@@ -31,6 +32,14 @@
                             <td>{{ passenger.PassengerId }}</td>
                             <td>{{ passenger.Name }}</td>
                             <td>{{ passenger.Age }}</td>
+                            <td>{{ passenger.Pclass }}</td>
+                            <td>{{ passenger.Sex }}</td>
+                            <td>{{ passenger.SibSp }}</td>
+                            <td>{{ passenger.Parch }}</td>
+                            <td>{{ passenger.Ticket }}</td>
+                            <td>{{ passenger.Fare }}</td>
+                            <td>{{ passenger.Cabin }}</td>
+                            <td>{{ passenger.Embarked }}</td>
                             <td>
                                 {% if passenger.Survived == 1 %}
                                     <span class="badge bg-success">Survived</span>
@@ -39,6 +48,10 @@
                                 {% endif %}
                             </td>
                         </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="12" class="text-center">No data available.</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -46,30 +59,4 @@
         </div>
     </div>
 </div>
-
-<!-- Chart.js Script -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ctx = document.getElementById('myChart').getContext('2d');
-    const myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Survived', 'Not Survived'],
-            datasets: [{
-                label: 'Passengers',
-                data: [{{ survived_count }}, {{ not_survived_count }}],
-                backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
-                borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-</script>
 {% endblock %}
