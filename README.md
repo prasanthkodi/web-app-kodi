@@ -1,5 +1,5 @@
 
-# Web App with Flask
+# Web App with Flask Python
 
 A full-stack web app built with **Flask**, featuring user authentication, a dashboard for exploring the Titanic dataset, and deployment on **Heroku**. Includes secure password storage, interactive data visualizations, and a responsive UI using **Bootstrap**.
 
