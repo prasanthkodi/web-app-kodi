@@ -3,6 +3,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from app import db
 from app.models import User
 from werkzeug.security import generate_password_hash, check_password_hash
+from app.models import TitanicData
 
 # Create a Blueprint for the main routes
 bp = Blueprint('main', __name__)
@@ -66,9 +67,9 @@ def signup():
 @bp.route('/dashboard')
 @login_required
 def dashboard():
-    # Fetch data for the dashboard (e.g., Titanic data)
-    # Example: passengers = TitanicData.query.all()
-    return render_template('dashboard.html')
+    passengers = TitanicData.query.all()  # Fetch first 10 records
+    return render_template('dashboard.html', passengers=passengers)
+
 
 @bp.route('/logout')
 def logout():
