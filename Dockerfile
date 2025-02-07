@@ -1,10 +1,18 @@
-FROM python:3.9-slim
+# Use the official lightweight Python image
+FROM python:3.10-slim
 
+# Set the working directory in the container
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# Copy application files
+COPY . /app
 
-COPY . .
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "run:app"]
+# Expose the port Heroku provides
+ENV PORT=5000
+EXPOSE $PORT
+
+# Start the application with Gunicorn
+CMD gunicorn --workers=4 --bind 0.0.0.0:$PORT run:app

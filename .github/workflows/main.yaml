@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Deploy to Heroku
 
 on:
   push:
@@ -6,46 +6,27 @@ on:
       - main
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run tests
-        run: |
-          python -m unittest discover -s tests -p "test_*.py"
-
   deploy:
-    needs: test
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
-
-      - name: Install dependencies
+      - name: Log in to Heroku Container Registry
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          echo ${{ secrets.HEROKU_API_KEY }} | docker login --username=_ --password-stdin registry.heroku.com
 
-      - name: Deploy to Heroku
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      - name: Build and push Docker image
         run: |
-          git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/your-app-name.git
-          git push heroku main
+          docker build -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
+          docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+
+      - name: Release Docker container on Heroku
+        run: |
+          IMAGE_ID=$(docker inspect registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web --format={{.Id}})
+          curl -n -X PATCH https://api.heroku.com/apps/${{ secrets.HEROKU_APP_NAME }}/formation \
+          -d '{"updates":[{"type":"web","docker_image":"'"$IMAGE_ID"'"}]}' \
+          -H "Content-Type: application/json" \
+          -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
+          -H "Authorization: Bearer ${{ secrets.HEROKU_API_KEY }}"
